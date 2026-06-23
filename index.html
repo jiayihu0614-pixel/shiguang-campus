@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="拾光校园 - 面向大学生的校园活动发现、收藏与报名平台">
+  <title>拾光校园 | 校园活动发现平台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23176b4d'/%3E%3Cpath d='M18 18h28v6H35v22h-6V24H18z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header" id="top">
+    <div class="header-inner">
+      <a class="brand" href="#home" data-route="home" aria-label="拾光校园首页">
+        <span class="brand-mark">拾</span>
+        <span>
+          <strong>拾光校园</strong>
+          <small>发现每一种热爱</small>
+        </span>
+      </a>
+
+      <button class="menu-button" id="menuButton" type="button" aria-label="打开导航" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav" aria-label="主导航">
+        <a href="#home" data-route="home" class="active">首页</a>
+        <a href="#events" data-route="events">活动广场</a>
+        <a href="#schedule" data-route="schedule">我的日程</a>
+        <a href="#profile" data-route="profile">个人中心</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-button" id="themeButton" type="button" aria-label="切换深色模式" title="切换主题">
+          <span aria-hidden="true">◐</span>
+        </button>
+        <button class="avatar-button" type="button" data-route="profile" aria-label="进入个人中心">同</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page active" id="page-home" data-page="home">
+      <div class="hero">
+        <img src="assets/campus-cover.jpg" alt="校园主楼、国旗和林荫广场景观">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="eyebrow">CAMPUS MOMENTS · 2026</p>
+          <h1>让大学生活，<br>不止一种打开方式</h1>
+          <p>发现兴趣同伴，报名精彩活动，把每一次参与变成值得收藏的校园记忆。</p>
+          <div class="hero-actions">
+            <button class="primary-button" type="button" data-route="events">探索活动 <span>→</span></button>
+            <button class="secondary-button" type="button" id="randomEventButton">帮我选一个</button>
+          </div>
+          <div class="hero-stats" aria-label="平台数据">
+            <div><strong>36</strong><span>本周活动</span></div>
+            <div><strong>18</strong><span>活跃社团</span></div>
+            <div><strong>1,280</strong><span>同学参与</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-shell home-content">
+        <section class="section-block" aria-labelledby="featuredTitle">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">WEEKLY PICKS</p>
+              <h2 id="featuredTitle">本周精选</h2>
+            </div>
+            <button class="text-button" type="button" data-route="events">查看全部 <span>→</span></button>
+          </div>
+          <div class="event-grid" id="featuredGrid"></div>
+        </section>
+
+        <section class="category-band" aria-labelledby="categoryTitle">
+          <div>
+            <p class="section-kicker">FIND YOUR PEOPLE</p>
+            <h2 id="categoryTitle">从兴趣出发</h2>
+            <p>无论你喜欢运动、艺术、技术还是公益，都能在这里找到同行的人。</p>
+          </div>
+          <div class="category-list" id="homeCategories"></div>
+        </section>
+
+        <section class="story-section" aria-labelledby="storyTitle">
+          <div class="story-copy">
+            <span class="story-number">01</span>
+            <p class="section-kicker">CAMPUS STORY</p>
+            <h2 id="storyTitle">从一次偶然报名，<br>到一群长期伙伴</h2>
+            <p>“大一刚入学时，我在拾光校园报名了夜跑活动。现在，我们已经一起跑过三季校园马拉松。”</p>
+            <div class="story-person">
+              <span class="mini-avatar">周</span>
+              <div><strong>周予安</strong><small>计算机科学学院 · 2024级</small></div>
+            </div>
+          </div>
+          <div class="story-visual" aria-label="校园跑步社团故事">
+            <div class="track-ring ring-one"></div>
+            <div class="track-ring ring-two"></div>
+            <div class="story-badge"><strong>48</strong><span>公里共同里程</span></div>
+            <div class="runner-card runner-one">RUN<br><strong>06:30</strong></div>
+            <div class="runner-card runner-two">TEAM<br><strong>12人</strong></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="page" id="page-events" data-page="events">
+      <div class="page-banner">
+        <div>
+          <p class="section-kicker">EXPLORE CAMPUS</p>
+          <h1>活动广场</h1>
+          <p>筛选你感兴趣的主题，安排下一次校园体验。</p>
+          <button class="publish-button" id="publishButton" type="button">＋ 发布活动</button>
+        </div>
+        <div class="banner-count"><strong id="eventCount">0</strong><span>场活动可报名</span></div>
+      </div>
+
+      <div class="content-shell">
+        <div class="filter-toolbar">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="搜索活动、地点或社团" autocomplete="off">
+          </label>
+          <div class="filter-selects">
+            <label>
+              <span>分类</span>
+              <select id="categoryFilter">
+                <option value="all">全部分类</option>
+              </select>
+            </label>
+            <label>
+              <span>时间</span>
+              <select id="timeFilter">
+                <option value="all">全部时间</option>
+                <option value="today">今天</option>
+                <option value="week">本周</option>
+                <option value="month">本月</option>
+              </select>
+            </label>
+            <label>
+              <span>排序</span>
+              <select id="sortFilter">
+                <option value="recommended">综合推荐</option>
+                <option value="soon">时间最近</option>
+                <option value="popular">热度最高</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="active-filter-row" id="activeFilterRow"></div>
+        <div class="event-grid full-grid" id="allEventsGrid"></div>
+        <div class="empty-state" id="emptyState" hidden>
+          <strong>没有找到匹配活动</strong>
+          <p>换一个关键词或清除筛选条件试试。</p>
+          <button class="secondary-button" id="clearFiltersButton" type="button">清除筛选</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-schedule" data-page="schedule">
+      <div class="page-banner compact-banner">
+        <div>
+          <p class="section-kicker">MY SCHEDULE</p>
+          <h1>我的日程</h1>
+          <p>已报名活动会自动加入日程，重要安排不再错过。</p>
+        </div>
+      </div>
+      <div class="content-shell schedule-layout">
+        <aside class="calendar-panel" aria-label="六月日历">
+          <div class="calendar-header">
+            <button type="button" aria-label="上个月">‹</button>
+            <strong>2026年 6月</strong>
+            <button type="button" aria-label="下个月">›</button>
+          </div>
+          <div class="week-row"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="calendar-legend"><span></span> 有活动安排</div>
+        </aside>
+        <section class="agenda-panel" aria-labelledby="agendaTitle">
+          <div class="section-heading">
+            <div><p class="section-kicker">UPCOMING</p><h2 id="agendaTitle">接下来的活动</h2></div>
+            <span class="registration-count" id="registrationCount"></span>
+          </div>
+          <div class="agenda-list" id="agendaList"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="page" id="page-profile" data-page="profile">
+      <div class="profile-hero">
+        <div class="profile-avatar" id="profileAvatar">同</div>
+        <div>
+          <p>你好，欢迎回来</p>
+          <h1 id="profileName">请先登录</h1>
+          <span id="profileSummary">登录后查看个人资料</span>
+        </div>
+        <button class="secondary-button" type="button" id="editProfileButton">编辑资料</button>
+      </div>
+      <div class="content-shell profile-layout">
+        <section class="profile-main">
+          <div class="metric-row">
+            <div><strong id="joinedMetric">0</strong><span>已报名</span></div>
+            <div><strong id="favoriteMetric">0</strong><span>收藏活动</span></div>
+            <button class="footprint-metric" id="footprintButton" type="button" aria-label="查看参与足迹">
+              <strong id="footprintMetric">0</strong><span>参与足迹</span><small>查看记录 →</small>
+            </button>
+          </div>
+          <div class="section-heading profile-heading">
+            <div><p class="section-kicker">FAVORITES</p><h2>我的收藏</h2></div>
+          </div>
+          <div class="event-grid profile-grid" id="favoriteGrid"></div>
+          <div class="section-heading profile-heading published-heading">
+            <div><p class="section-kicker">MY EVENTS</p><h2>我发布的活动</h2></div>
+            <button class="text-button" type="button" data-route="events">发布新活动 ＋</button>
+          </div>
+          <div class="event-grid profile-grid" id="publishedGrid"></div>
+        </section>
+        <aside class="profile-sidebar">
+          <div class="interest-panel">
+            <div class="panel-title"><h2>兴趣标签</h2><button type="button" id="editInterestsButton">编辑</button></div>
+            <div class="interest-tags" id="interestTags">
+              <span>编程</span><span>摄影</span><span>跑步</span><span>志愿服务</span>
+            </div>
+          </div>
+          <div class="achievement-panel">
+            <p class="section-kicker">ACHIEVEMENT</p>
+            <h2>校园探索者</h2>
+            <p>再参加 2 场不同分类的活动，即可解锁新徽章。</p>
+            <div class="progress-track"><span style="width: 68%"></span></div>
+            <small>进度 68%</small>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="brand footer-brand"><span class="brand-mark">拾</span><span><strong>拾光校园</strong><small>发现每一种热爱</small></span></div>
+      <p>Web应用开发课程期末作品 · 校园活动发现平台</p>
+      <button class="text-button" type="button" data-route="home">返回顶部 ↑</button>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="eventModal" hidden>
+    <article class="event-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" type="button" aria-label="关闭">×</button>
+      <div class="modal-poster" id="modalPoster"></div>
+      <div class="modal-body">
+        <div class="modal-meta"><span id="modalCategory"></span><span id="modalStatus"></span></div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalDescription"></p>
+        <dl class="detail-list">
+          <div><dt>时间</dt><dd id="modalTime"></dd></div>
+          <div><dt>地点</dt><dd id="modalLocation"></dd></div>
+          <div><dt>主办</dt><dd id="modalHost"></dd></div>
+          <div><dt>名额</dt><dd id="modalCapacity"></dd></div>
+        </dl>
+        <div class="modal-actions">
+          <button class="secondary-button" id="modalFavorite" type="button">收藏活动</button>
+          <button class="primary-button" id="modalRegister" type="button">立即报名</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="modal-backdrop" id="formModal" hidden>
+    <form class="form-modal" id="registrationForm">
+      <button class="modal-close" id="formClose" type="button" aria-label="关闭">×</button>
+      <p class="section-kicker">EVENT REGISTRATION</p>
+      <h2>确认报名信息</h2>
+      <p id="formEventName"></p>
+      <label>姓名<input name="name" required maxlength="20"></label>
+      <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号"></label>
+      <label>年级<input name="grade" required maxlength="10"></label>
+      <label>班级<input name="className" required maxlength="30"></label>
+      <label>联系电话<input name="phone" placeholder="请输入11位手机号" required pattern="1\d{10}" title="请输入11位手机号"></label>
+      <label class="checkbox-label"><input type="checkbox" required> 我已阅读活动说明并确认按时参加</label>
+      <button class="primary-button full-button" type="submit">提交报名</button>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="profileModal" hidden>
+    <form class="form-modal" id="profileForm">
+      <button class="modal-close" id="profileFormClose" type="button" aria-label="关闭">×</button>
+      <p class="section-kicker">EDIT PROFILE</p>
+      <h2>编辑个人资料</h2>
+      <p>资料仅保存在当前浏览器中。</p>
+      <label>姓名<input name="name" required maxlength="20"></label>
+      <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号"></label>
+      <label>年级
+        <select name="grade" required>
+          <option value="2023级">2023级</option>
+          <option value="2024级">2024级</option>
+          <option value="2025级">2025级</option>
+          <option value="2026级">2026级</option>
+        </select>
+      </label>
+      <label>班级<input name="className" required maxlength="30" placeholder="例如：计科2401班"></label>
+      <label>联系电话<input name="phone" placeholder="请输入11位手机号" pattern="1\d{10}" title="请输入11位手机号"></label>
+      <button class="primary-button full-button profile-save-button" type="submit">保存资料</button>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="loginModal" hidden>
+    <form class="form-modal login-modal" id="loginForm" aria-labelledby="loginTitle">
+      <p class="section-kicker">STUDENT LOGIN</p>
+      <h2 id="loginTitle">学生登录</h2>
+      <p>请输入真实学生信息，登录后可报名、收藏并管理个人日程。</p>
+      <label>姓名<input name="name" required maxlength="20" placeholder="请输入姓名" autocomplete="name"></label>
+      <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号" placeholder="例如：2024110401" inputmode="numeric"></label>
+      <label>年级
+        <select name="grade" required>
+          <option value="">请选择年级</option>
+          <option value="2023级">2023级</option>
+          <option value="2024级">2024级</option>
+          <option value="2025级">2025级</option>
+          <option value="2026级">2026级</option>
+        </select>
+      </label>
+      <label>班级<input name="className" required maxlength="30" placeholder="例如：计科2401班"></label>
+      <button class="primary-button full-button" type="submit">进入拾光校园</button>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="footprintModal" hidden>
+    <section class="footprint-modal" role="dialog" aria-modal="true" aria-labelledby="footprintTitle">
+      <button class="modal-close" id="footprintClose" type="button" aria-label="关闭">×</button>
+      <div class="footprint-header">
+        <div>
+          <p class="section-kicker">CAMPUS JOURNEY</p>
+          <h2 id="footprintTitle">我的参与足迹</h2>
+          <p>每一次到场，都构成独一无二的校园记忆。</p>
+        </div>
+        <div class="footprint-total"><strong id="footprintTotal">0</strong><span>场活动</span></div>
+      </div>
+      <div class="footprint-list" id="footprintList"></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="publishModal" hidden>
+    <form class="form-modal publish-modal" id="publishForm">
+      <button class="modal-close" id="publishClose" type="button" aria-label="关闭">×</button>
+      <p class="section-kicker">CREATE EVENT</p>
+      <h2>发布校园活动</h2>
+      <p>填写完整信息，发布后将立即显示在活动广场。</p>
+      <div class="publish-form-grid">
+        <label class="wide-field">活动名称<input name="title" required maxlength="40" placeholder="请输入活动名称"></label>
+        <label>活动分类
+          <select name="category" required>
+            <option value="科技">科技</option>
+            <option value="运动">运动</option>
+            <option value="艺术">艺术</option>
+            <option value="公益">公益</option>
+            <option value="音乐">音乐</option>
+            <option value="阅读">阅读</option>
+          </select>
+        </label>
+        <label>活动日期<input name="date" type="date" min="2026-06-23" required></label>
+        <label>开始时间<input name="startTime" type="time" required></label>
+        <label>结束时间<input name="endTime" type="time" required></label>
+        <label class="wide-field">活动地点<input name="location" required maxlength="40" placeholder="例如：成龙校区 A6-301"></label>
+        <label>主办方<input name="host" required maxlength="30" placeholder="社团或组织名称"></label>
+        <label>活动名额<input name="capacity" type="number" min="5" max="500" value="50" required></label>
+        <label class="wide-field">活动介绍<textarea name="description" required maxlength="300" rows="4" placeholder="介绍活动内容、参与要求和注意事项"></textarea></label>
+      </div>
+      <label class="checkbox-label"><input type="checkbox" required> 我确认活动信息真实、内容积极健康</label>
+      <button class="primary-button full-button" type="submit">确认发布</button>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
