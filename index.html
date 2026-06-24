@@ -6,6 +6,7 @@
   <meta name="description" content="拾光校园 - 面向大学生的校园活动发现、收藏与报名平台">
   <title>拾光校园 | 校园活动发现平台</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23176b4d'/%3E%3Cpath d='M18 18h28v6H35v22h-6V24H18z' fill='white'/%3E%3C/svg%3E">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -36,7 +37,7 @@
         <button class="icon-button" id="themeButton" type="button" aria-label="切换深色模式" title="切换主题">
           <span aria-hidden="true">◐</span>
         </button>
-        <button class="avatar-button" type="button" data-route="profile" aria-label="进入个人中心">同</button>
+        <button class="avatar-button" type="button" data-route="profile" aria-label="进入个人中心">?</button>
       </div>
     </div>
   </header>
@@ -189,11 +190,11 @@
 
     <section class="page" id="page-profile" data-page="profile">
       <div class="profile-hero">
-        <div class="profile-avatar" id="profileAvatar">同</div>
+        <div class="profile-avatar" id="profileAvatar">?</div>
         <div>
           <p>你好，欢迎回来</p>
           <h1 id="profileName">请先登录</h1>
-          <span id="profileSummary">登录后查看个人资料</span>
+          <span id="profileSummary">未绑定校园身份</span>
         </div>
         <button class="secondary-button" type="button" id="editProfileButton">编辑资料</button>
       </div>
@@ -202,8 +203,8 @@
           <div class="metric-row">
             <div><strong id="joinedMetric">0</strong><span>已报名</span></div>
             <div><strong id="favoriteMetric">0</strong><span>收藏活动</span></div>
-            <button class="footprint-metric" id="footprintButton" type="button" aria-label="查看参与足迹">
-              <strong id="footprintMetric">0</strong><span>参与足迹</span><small>查看记录 →</small>
+            <button class="footprint-metric" id="footprintButton" type="button" aria-label="查看6条参与足迹">
+              <strong>6</strong><span>参与足迹</span><small>查看记录 →</small>
             </button>
           </div>
           <div class="section-heading profile-heading">
@@ -273,8 +274,6 @@
       <p id="formEventName"></p>
       <label>姓名<input name="name" required maxlength="20"></label>
       <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号"></label>
-      <label>年级<input name="grade" required maxlength="10"></label>
-      <label>班级<input name="className" required maxlength="30"></label>
       <label>联系电话<input name="phone" placeholder="请输入11位手机号" required pattern="1\d{10}" title="请输入11位手机号"></label>
       <label class="checkbox-label"><input type="checkbox" required> 我已阅读活动说明并确认按时参加</label>
       <button class="primary-button full-button" type="submit">提交报名</button>
@@ -287,40 +286,20 @@
       <p class="section-kicker">EDIT PROFILE</p>
       <h2>编辑个人资料</h2>
       <p>资料仅保存在当前浏览器中。</p>
-      <label>姓名<input name="name" required maxlength="20"></label>
-      <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号"></label>
+      <label>姓名<input name="name" required maxlength="20" placeholder="请输入姓名"></label>
+      <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号" placeholder="请输入10位数字学号"></label>
+      <label>学院<input name="college" required maxlength="30" placeholder="请输入学院名称"></label>
+      <label>班级<input name="className" required maxlength="30" placeholder="例如：24级计算机1班"></label>
       <label>年级
         <select name="grade" required>
-          <option value="2023级">2023级</option>
-          <option value="2024级">2024级</option>
-          <option value="2025级">2025级</option>
-          <option value="2026级">2026级</option>
+          <option value="2023级">2022级</option>
+          <option value="2024级">2023级</option>
+          <option value="2025级">2024级</option>
+          <option value="2026级">2025级</option>
         </select>
       </label>
-      <label>班级<input name="className" required maxlength="30" placeholder="例如：计科2401班"></label>
       <label>联系电话<input name="phone" placeholder="请输入11位手机号" pattern="1\d{10}" title="请输入11位手机号"></label>
       <button class="primary-button full-button profile-save-button" type="submit">保存资料</button>
-    </form>
-  </div>
-
-  <div class="modal-backdrop" id="loginModal" hidden>
-    <form class="form-modal login-modal" id="loginForm" aria-labelledby="loginTitle">
-      <p class="section-kicker">STUDENT LOGIN</p>
-      <h2 id="loginTitle">学生登录</h2>
-      <p>请输入真实学生信息，登录后可报名、收藏并管理个人日程。</p>
-      <label>姓名<input name="name" required maxlength="20" placeholder="请输入姓名" autocomplete="name"></label>
-      <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号" placeholder="例如：2024110401" inputmode="numeric"></label>
-      <label>年级
-        <select name="grade" required>
-          <option value="">请选择年级</option>
-          <option value="2023级">2023级</option>
-          <option value="2024级">2024级</option>
-          <option value="2025级">2025级</option>
-          <option value="2026级">2026级</option>
-        </select>
-      </label>
-      <label>班级<input name="className" required maxlength="30" placeholder="例如：计科2401班"></label>
-      <button class="primary-button full-button" type="submit">进入拾光校园</button>
     </form>
   </div>
 
@@ -333,7 +312,7 @@
           <h2 id="footprintTitle">我的参与足迹</h2>
           <p>每一次到场，都构成独一无二的校园记忆。</p>
         </div>
-        <div class="footprint-total"><strong id="footprintTotal">0</strong><span>场活动</span></div>
+        <div class="footprint-total"><strong>6</strong><span>场活动</span></div>
       </div>
       <div class="footprint-list" id="footprintList"></div>
     </section>
@@ -360,7 +339,7 @@
         <label>活动日期<input name="date" type="date" min="2026-06-23" required></label>
         <label>开始时间<input name="startTime" type="time" required></label>
         <label>结束时间<input name="endTime" type="time" required></label>
-        <label class="wide-field">活动地点<input name="location" required maxlength="40" placeholder="例如：成龙校区 A6-301"></label>
+        <label class="wide-field">活动地点<input name="location" required maxlength="40" placeholder="例如：成龙校区 A-301"></label>
         <label>主办方<input name="host" required maxlength="30" placeholder="社团或组织名称"></label>
         <label>活动名额<input name="capacity" type="number" min="5" max="500" value="50" required></label>
         <label class="wide-field">活动介绍<textarea name="description" required maxlength="300" rows="4" placeholder="介绍活动内容、参与要求和注意事项"></textarea></label>
@@ -371,6 +350,9 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
