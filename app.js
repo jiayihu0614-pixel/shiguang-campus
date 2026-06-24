@@ -9,7 +9,7 @@ const events = [
     code: "AI",
     date: "2026-06-24",
     time: "14:00 - 17:00",
-    location: "成龙校区 A6-301",
+    location: "成龙校区 第一实验楼西-102",
     host: "计算机协会",
     capacity: 60,
     joined: 43,
@@ -39,7 +39,7 @@ const events = [
     code: "FILM",
     date: "2026-06-27",
     time: "09:30 - 12:00",
-    location: "狮子山校区第三教学楼前",
+    location: "狮子山校区第七教学楼前",
     host: "光影摄影社",
     capacity: 35,
     joined: 29,
@@ -54,7 +54,7 @@ const events = [
     code: "RE",
     date: "2026-06-28",
     time: "10:00 - 16:30",
-    location: "成龙校区生活广场",
+    location: "成龙校区西苑食堂门口",
     host: "青年志愿者协会",
     capacity: 80,
     joined: 51,
@@ -84,7 +84,7 @@ const events = [
     code: "BOOK",
     date: "2026-07-02",
     time: "15:00 - 17:00",
-    location: "图书馆共享空间",
+    location: "成龙校区图书馆一楼",
     host: "悦读书友会",
     capacity: 30,
     joined: 18,
@@ -99,7 +99,7 @@ const events = [
     code: "WEB",
     date: "2026-07-04",
     time: "19:00 - 21:00",
-    location: "成龙校区 A5-201",
+    location: "成龙校区 A-201",
     host: "Web 开发兴趣组",
     capacity: 70,
     joined: 39,
@@ -150,10 +150,19 @@ const categories = [
   { name: "阅读", icon: "▤", text: "思想与交流" }
 ];
 
+const footprints = [
+  { date: "2026-05-30", title: "校园定向寻宝挑战", category: "运动", location: "狮子山校区", badge: "探索达人" },
+  { date: "2026-05-18", title: "用代码点亮创意：Web 开放日", category: "科技", location: "成龙校区 第一实验楼", badge: "代码新星" },
+  { date: "2026-04-26", title: "世界读书日换书计划", category: "阅读", location: "成龙校区图书馆", badge: "悦读伙伴" },
+  { date: "2026-04-12", title: "春日校园公益植树行动", category: "公益", location: "成龙校区", badge: "绿色行动" },
+  { date: "2026-03-29", title: "校园春声民谣分享会", category: "音乐", location: "生态广场", badge: "现场听众" },
+  { date: "2026-03-15", title: "新学期手机摄影漫步", category: "艺术", location: "狮子山校区", badge: "光影记录" }
+];
+
 const state = {
   route: "home",
-  favorites: new Set(JSON.parse(localStorage.getItem("campusFavorites") || "[]")),
-  registrations: new Set(JSON.parse(localStorage.getItem("campusRegistrations") || "[]")),
+  favorites: new Set(JSON.parse(localStorage.getItem("campusFavorites") || "[2,3]")),
+  registrations: new Set(JSON.parse(localStorage.getItem("campusRegistrations") || "[1,2]")),
   activeEventId: null,
   profile: JSON.parse(localStorage.getItem("campusProfile") || "null")
 };
@@ -171,50 +180,24 @@ function saveCustomEvents() {
   localStorage.setItem("campusCustomEvents", JSON.stringify(customEvents));
 }
 
-function hasCompleteProfile() {
-  return Boolean(
-    state.profile &&
-    state.profile.name &&
-    state.profile.studentId &&
-    state.profile.grade &&
-    state.profile.className
-  );
-}
+function renderProfile() {
+  if (state.profile && state.profile.name && state.profile.studentId) {
+    const initial = state.profile.name.trim().charAt(0) || "?";
+    $("#profileAvatar").textContent = initial;
+    $(".avatar-button").textContent = initial;
+    $("#profileName").textContent = state.profile.name;
+    $("#profileSummary").textContent = `${state.profile.college} · ${state.profile.className} · ${state.profile.grade}`;
+  } else {
 
-function openLoginForm() {
-  const form = $("#loginForm");
-  $("#loginModal").hidden = false;
-  document.body.style.overflow = "hidden";
-  setTimeout(() => form.elements.name.focus(), 0);
-}
-
-function closeLoginForm() {
-  $("#loginModal").hidden = true;
-  if ($("#eventModal").hidden && $("#formModal").hidden && $("#profileModal").hidden && $("#footprintModal").hidden && $("#publishModal").hidden) {
-    document.body.style.overflow = "";
+    $("#profileAvatar").textContent = "?";
+    $(".avatar-button").textContent = "?";
+    $("#profileName").textContent = "请先登录";
+    $("#profileSummary").textContent = "未绑定校园身份";
   }
 }
 
-function renderProfile() {
-  const initial = hasCompleteProfile() ? state.profile.name.trim().charAt(0) || "同" : "同";
-  $("#profileAvatar").textContent = initial;
-  $(".avatar-button").textContent = initial;
-  $("#profileName").textContent = hasCompleteProfile() ? state.profile.name : "请先登录";
-  $("#profileSummary").textContent = hasCompleteProfile()
-    ? `${state.profile.studentId} · ${state.profile.grade} · ${state.profile.className}`
-    : "登录后查看个人资料";
-}
-
 function renderFootprints() {
-  const footprintEvents = events
-    .filter(event => state.registrations.has(event.id))
-    .sort((a, b) => new Date(`${a.date}T12:00:00`) - new Date(`${b.date}T12:00:00`));
-
-  $("#footprintMetric").textContent = footprintEvents.length;
-  $("#footprintTotal").textContent = footprintEvents.length;
-  $("#footprintButton").setAttribute("aria-label", `查看${footprintEvents.length}条参与足迹`);
-
-  $("#footprintList").innerHTML = footprintEvents.length ? footprintEvents.map(item => `
+  $("#footprintList").innerHTML = footprints.map(item => `
     <article class="footprint-item">
       <div class="footprint-date">
         <strong>${formatDate(item.date)}</strong>
@@ -222,29 +205,24 @@ function renderFootprints() {
       </div>
       <div class="footprint-content">
         <h3>${item.title}</h3>
-        <p>${item.location} · 已报名</p>
+        <p>${item.location} · 已完成</p>
       </div>
-      <span class="footprint-badge">已加入日程</span>
+      <span class="footprint-badge">${item.badge}</span>
     </article>
-  `).join("") : `
-    <div class="empty-collection">
-      <strong>还没有参与足迹</strong>
-      <p>报名活动后，这里会自动记录你的校园参与经历。</p>
-    </div>
-  `;
+  `).join("");
 }
 
 function openProfileForm() {
-  if (!hasCompleteProfile()) {
-    openLoginForm();
-    return;
-  }
   const form = $("#profileForm");
-  form.elements.name.value = state.profile.name;
-  form.elements.studentId.value = state.profile.studentId;
-  form.elements.grade.value = state.profile.grade;
-  form.elements.className.value = state.profile.className;
-  form.elements.phone.value = state.profile.phone || "";
+  const p = state.profile || {};
+  
+  form.elements.name.value = p.name || "";
+  form.elements.studentId.value = p.studentId || "";
+  form.elements.college.value = p.college || "";
+  form.elements.className.value = p.className || "";
+  form.elements.grade.value = p.grade || "2024级";
+  form.elements.phone.value = p.phone || "";
+  
   $("#profileModal").hidden = false;
   document.body.style.overflow = "hidden";
   form.elements.name.focus();
@@ -427,7 +405,6 @@ function renderDynamicViews() {
   renderAllEvents();
   renderAgenda();
   renderFavorites();
-  renderFootprints();
   renderPublished();
 }
 
@@ -463,16 +440,7 @@ function showEvent(id) {
 
 function closeModal(modal) {
   modal.hidden = true;
-  if (
-    $("#eventModal").hidden &&
-    $("#formModal").hidden &&
-    $("#profileModal").hidden &&
-    $("#footprintModal").hidden &&
-    $("#publishModal").hidden &&
-    $("#loginModal").hidden
-  ) {
-    document.body.style.overflow = "";
-  }
+  if ($("#eventModal").hidden && $("#formModal").hidden) document.body.style.overflow = "";
 }
 
 function toggleFavorite(id) {
@@ -489,25 +457,26 @@ function toggleFavorite(id) {
   if (!$("#eventModal").hidden && state.activeEventId === numericId) showEvent(numericId);
 }
 
+// 【关键修改】打开活动报名表单：若发现未保存个人资料，提示并阻止报名，引导用户先补全身份信息
 function openRegistrationForm() {
   const event = events.find(item => item.id === state.activeEventId);
   if (!event) return;
-  if (!hasCompleteProfile()) {
-    closeModal($("#eventModal"));
-    openLoginForm();
-    toast("请先完成学生登录");
-    return;
-  }
   if (state.registrations.has(event.id)) {
     closeModal($("#eventModal"));
     navigate("schedule");
     return;
   }
+  
+  if (!state.profile || !state.profile.name || !state.profile.studentId) {
+    toast("请先去个人中心编辑资料并绑定学号班级！");
+    closeModal($("#eventModal"));
+    navigate("profile");
+    return;
+  }
+
   $("#registrationForm").elements.name.value = state.profile.name;
   $("#registrationForm").elements.studentId.value = state.profile.studentId;
-  $("#registrationForm").elements.grade.value = state.profile.grade;
-  $("#registrationForm").elements.className.value = state.profile.className;
-  $("#registrationForm").elements.phone.value = state.profile.phone || "";
+  $("#registrationForm").elements.phone.value = state.profile.phone;
   $("#formEventName").textContent = event.title;
   $("#formModal").hidden = false;
 }
@@ -598,18 +567,13 @@ function bindEvents() {
 
   $("#clearFiltersButton").addEventListener("click", resetFilters);
   $("#publishButton").addEventListener("click", () => {
-    if (!hasCompleteProfile()) {
-      openLoginForm();
-      toast("请先完成学生登录");
-      return;
-    }
     const form = $("#publishForm");
     form.reset();
     form.elements.date.value = "2026-06-24";
     form.elements.startTime.value = "14:00";
     form.elements.endTime.value = "16:00";
     form.elements.capacity.value = "50";
-    form.elements.host.value = state.profile.className;
+    form.elements.host.value = state.profile ? state.profile.college : "未知组织";
     $("#publishModal").hidden = false;
     document.body.style.overflow = "hidden";
     form.elements.title.focus();
@@ -633,7 +597,6 @@ function bindEvents() {
 
   $("#registrationForm").addEventListener("submit", event => {
     event.preventDefault();
-    state.profile.phone = event.currentTarget.elements.phone.value.trim();
     state.registrations.add(state.activeEventId);
     saveState();
     closeModal($("#formModal"));
@@ -695,36 +658,23 @@ function bindEvents() {
   $("#profileModal").addEventListener("click", event => {
     if (event.target === $("#profileModal")) closeModal($("#profileModal"));
   });
+  
+  // 【关键修改】处理个人资料提交：完整捕获新增的 studentId (学号) 和 className (班级) 并更新系统状态
   $("#profileForm").addEventListener("submit", event => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     state.profile = {
       name: formData.get("name").trim(),
       studentId: formData.get("studentId").trim(),
-      grade: formData.get("grade"),
+      college: formData.get("college").trim(),
       className: formData.get("className").trim(),
+      grade: formData.get("grade"),
       phone: formData.get("phone").trim()
     };
     saveState();
     renderProfile();
     closeModal($("#profileModal"));
-    toast("个人资料已保存");
-  });
-
-  $("#loginForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    state.profile = {
-      name: formData.get("name").trim(),
-      studentId: formData.get("studentId").trim(),
-      grade: formData.get("grade"),
-      className: formData.get("className").trim(),
-      phone: ""
-    };
-    saveState();
-    renderProfile();
-    closeLoginForm();
-    toast(`${state.profile.name}，登录成功`);
+    toast("个人资料已保存，身份绑定成功！");
   });
   $("#editInterestsButton").addEventListener("click", () => toast("兴趣标签编辑功能演示"));
 
@@ -735,7 +685,6 @@ function bindEvents() {
       closeModal($("#profileModal"));
       closeModal($("#footprintModal"));
       closeModal($("#publishModal"));
-      if (!hasCompleteProfile()) openLoginForm();
     }
   });
 }
@@ -749,7 +698,6 @@ function init() {
   bindEvents();
   const initialRoute = location.hash.replace("#", "");
   navigate(["home", "events", "schedule", "profile"].includes(initialRoute) ? initialRoute : "home");
-  if (!hasCompleteProfile()) openLoginForm();
 }
 
 init();
