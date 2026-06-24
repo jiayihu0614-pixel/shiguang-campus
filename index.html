@@ -203,8 +203,8 @@
           <div class="metric-row">
             <div><strong id="joinedMetric">0</strong><span>已报名</span></div>
             <div><strong id="favoriteMetric">0</strong><span>收藏活动</span></div>
-            <button class="footprint-metric" id="footprintButton" type="button" aria-label="查看6条参与足迹">
-              <strong>6</strong><span>参与足迹</span><small>查看记录 →</small>
+            <button class="footprint-metric" id="footprintButton" type="button" aria-label="查看0条参与足迹">
+              <strong id="footprintMetric">0</strong><span>参与足迹</span><small>查看记录 →</small>
             </button>
           </div>
           <div class="section-heading profile-heading">
@@ -274,7 +274,10 @@
       <p id="formEventName"></p>
       <label>姓名<input name="name" required maxlength="20"></label>
       <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号"></label>
-      <label>联系电话<input name="phone" placeholder="请输入11位手机号" required pattern="1\d{10}" title="请输入11位手机号"></label>
+      <label>学院<input name="college" required maxlength="30"></label>
+      <label>年级<input name="grade" required maxlength="10"></label>
+      <label>班级<input name="className" required maxlength="30"></label>
+      <label>联系电话<input name="phone" placeholder="可不填，需填写时请输入11位手机号" pattern="1\d{10}" title="请输入11位手机号"></label>
       <label class="checkbox-label"><input type="checkbox" required> 我已阅读活动说明并确认按时参加</label>
       <button class="primary-button full-button" type="submit">提交报名</button>
     </form>
@@ -284,21 +287,32 @@
     <form class="form-modal" id="profileForm">
       <button class="modal-close" id="profileFormClose" type="button" aria-label="关闭">×</button>
       <p class="section-kicker">EDIT PROFILE</p>
-      <h2>编辑个人资料</h2>
-      <p>资料仅保存在当前浏览器中。</p>
+      <h2 id="profileFormTitle">学生登录</h2>
+      <p id="profileFormIntro">请先填写校园身份信息，登录后才能报名和创建活动。</p>
       <label>姓名<input name="name" required maxlength="20" placeholder="请输入姓名"></label>
       <label>学号<input name="studentId" required pattern="\d{10}" title="请输入10位学号" placeholder="请输入10位数字学号"></label>
       <label>学院<input name="college" required maxlength="30" placeholder="请输入学院名称"></label>
-      <label>班级<input name="className" required maxlength="30" placeholder="例如：24级计算机1班"></label>
       <label>年级
         <select name="grade" required>
-          <option value="2023级">2022级</option>
-          <option value="2024级">2023级</option>
-          <option value="2025级">2024级</option>
-          <option value="2026级">2025级</option>
+          <option value="2022级">2022级</option>
+          <option value="2023级">2023级</option>
+          <option value="2024级">2024级</option>
+          <option value="2025级">2025级</option>
         </select>
       </label>
-      <label>联系电话<input name="phone" placeholder="请输入11位手机号" pattern="1\d{10}" title="请输入11位手机号"></label>
+      <label>班级
+        <select name="className" required>
+          <option value="1班">1班</option>
+          <option value="2班">2班</option>
+          <option value="3班">3班</option>
+          <option value="4班">4班</option>
+          <option value="5班">5班</option>
+          <option value="6班">6班</option>
+          <option value="7班">7班</option>
+          <option value="8班">8班</option>
+        </select>
+      </label>
+      <label>联系电话<input name="phone" placeholder="可不填，需填写时请输入11位手机号" pattern="1\d{10}" title="请输入11位手机号"></label>
       <button class="primary-button full-button profile-save-button" type="submit">保存资料</button>
     </form>
   </div>
@@ -312,7 +326,7 @@
           <h2 id="footprintTitle">我的参与足迹</h2>
           <p>每一次到场，都构成独一无二的校园记忆。</p>
         </div>
-        <div class="footprint-total"><strong>6</strong><span>场活动</span></div>
+        <div class="footprint-total"><strong id="footprintTotal">0</strong><span>场活动</span></div>
       </div>
       <div class="footprint-list" id="footprintList"></div>
     </section>

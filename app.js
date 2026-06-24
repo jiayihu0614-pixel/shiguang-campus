@@ -1,5 +1,13 @@
 "use strict";
 
+const DATA_VERSION = "student-login-20260624-owner-delete";
+if (localStorage.getItem("campusDataVersion") !== DATA_VERSION) {
+  localStorage.removeItem("campusProfile");
+  localStorage.removeItem("campusFavorites");
+  localStorage.removeItem("campusRegistrations");
+  localStorage.setItem("campusDataVersion", DATA_VERSION);
+}
+
 const events = [
   {
     id: 1,
@@ -150,19 +158,10 @@ const categories = [
   { name: "阅读", icon: "▤", text: "思想与交流" }
 ];
 
-const footprints = [
-  { date: "2026-05-30", title: "校园定向寻宝挑战", category: "运动", location: "狮子山校区", badge: "探索达人" },
-  { date: "2026-05-18", title: "用代码点亮创意：Web 开放日", category: "科技", location: "成龙校区 第一实验楼", badge: "代码新星" },
-  { date: "2026-04-26", title: "世界读书日换书计划", category: "阅读", location: "成龙校区图书馆", badge: "悦读伙伴" },
-  { date: "2026-04-12", title: "春日校园公益植树行动", category: "公益", location: "成龙校区", badge: "绿色行动" },
-  { date: "2026-03-29", title: "校园春声民谣分享会", category: "音乐", location: "生态广场", badge: "现场听众" },
-  { date: "2026-03-15", title: "新学期手机摄影漫步", category: "艺术", location: "狮子山校区", badge: "光影记录" }
-];
-
 const state = {
   route: "home",
-  favorites: new Set(JSON.parse(localStorage.getItem("campusFavorites") || "[2,3]")),
-  registrations: new Set(JSON.parse(localStorage.getItem("campusRegistrations") || "[1,2]")),
+  favorites: new Set(JSON.parse(localStorage.getItem("campusFavorites") || "[]")),
+  registrations: new Set(JSON.parse(localStorage.getItem("campusRegistrations") || "[]")),
   activeEventId: null,
   profile: JSON.parse(localStorage.getItem("campusProfile") || "null")
 };
@@ -180,13 +179,40 @@ function saveCustomEvents() {
   localStorage.setItem("campusCustomEvents", JSON.stringify(customEvents));
 }
 
+function hasCompleteProfile() {
+  return Boolean(
+    state.profile &&
+    state.profile.name &&
+    state.profile.studentId &&
+    state.profile.college &&
+    state.profile.grade &&
+    state.profile.className
+  );
+}
+
+function requireLogin(message = "请先登录并完善个人资料") {
+  if (hasCompleteProfile()) return true;
+  toast(message);
+  openProfileForm(true);
+  return false;
+}
+
+function isOwnEvent(event) {
+  return Boolean(
+    event &&
+    event.createdByUser &&
+    state.profile &&
+    event.ownerStudentId === state.profile.studentId
+  );
+}
+
 function renderProfile() {
-  if (state.profile && state.profile.name && state.profile.studentId) {
+  if (hasCompleteProfile()) {
     const initial = state.profile.name.trim().charAt(0) || "?";
     $("#profileAvatar").textContent = initial;
     $(".avatar-button").textContent = initial;
     $("#profileName").textContent = state.profile.name;
-    $("#profileSummary").textContent = `${state.profile.college} · ${state.profile.className} · ${state.profile.grade}`;
+    $("#profileSummary").textContent = `${state.profile.studentId} · ${state.profile.college} · ${state.profile.grade} · ${state.profile.className}`;
   } else {
 
     $("#profileAvatar").textContent = "?";
@@ -197,7 +223,15 @@ function renderProfile() {
 }
 
 function renderFootprints() {
-  $("#footprintList").innerHTML = footprints.map(item => `
+  const footprintEvents = events
+    .filter(event => state.registrations.has(event.id))
+    .sort((a, b) => new Date(`${a.date}T12:00:00`) - new Date(`${b.date}T12:00:00`));
+
+  $("#footprintMetric").textContent = footprintEvents.length;
+  $("#footprintTotal").textContent = footprintEvents.length;
+  $("#footprintButton").setAttribute("aria-label", `查看${footprintEvents.length}条参与足迹`);
+
+  $("#footprintList").innerHTML = footprintEvents.length ? footprintEvents.map(item => `
     <article class="footprint-item">
       <div class="footprint-date">
         <strong>${formatDate(item.date)}</strong>
@@ -205,16 +239,27 @@ function renderFootprints() {
       </div>
       <div class="footprint-content">
         <h3>${item.title}</h3>
-        <p>${item.location} · 已完成</p>
+        <p>${item.location} · 已报名</p>
       </div>
-      <span class="footprint-badge">${item.badge}</span>
+      <span class="footprint-badge">已加入日程</span>
     </article>
-  `).join("");
+  `).join("") : `
+    <div class="empty-collection">
+      <strong>还没有参与足迹</strong>
+      <p>报名活动后，这里会自动记录你的校园参与经历。</p>
+    </div>
+  `;
 }
 
-function openProfileForm() {
+function openProfileForm(isLogin = false) {
   const form = $("#profileForm");
   const p = state.profile || {};
+  const loginMode = isLogin || !hasCompleteProfile();
+
+  $("#profileFormTitle").textContent = loginMode ? "学生登录" : "编辑个人资料";
+  $("#profileFormIntro").textContent = loginMode
+    ? "请先填写校园身份信息，登录后才能报名和创建活动。"
+    : "资料仅保存在当前浏览器中。";
   
   form.elements.name.value = p.name || "";
   form.elements.studentId.value = p.studentId || "";
@@ -240,6 +285,7 @@ function formatDate(dateString, includeYear = false) {
 
 function eventCard(event, manage = false) {
   const isFavorite = state.favorites.has(event.id);
+  const canDelete = manage && isOwnEvent(event);
   return `
     <article class="event-card">
       <div class="event-poster poster-${event.poster}">
@@ -259,7 +305,7 @@ function eventCard(event, manage = false) {
         <p class="event-info">${event.time} · ${event.location}</p>
         <div class="event-card-footer">
           <span>${event.host}</span>
-          ${manage ? `
+          ${canDelete ? `
             <div class="published-actions">
               <button class="delete-event-button" type="button" data-delete-event="${event.id}">删除</button>
               <button class="detail-button" type="button" data-detail="${event.id}">查看 →</button>
@@ -391,7 +437,8 @@ function renderFavorites() {
 }
 
 function renderPublished() {
-  $("#publishedGrid").innerHTML = customEvents.length ? customEvents.map(event => eventCard(event, true)).join("") : `
+  const ownEvents = hasCompleteProfile() ? customEvents.filter(isOwnEvent) : [];
+  $("#publishedGrid").innerHTML = ownEvents.length ? ownEvents.map(event => eventCard(event, true)).join("") : `
     <div class="empty-collection">
       <strong>还没有发布活动</strong>
       <p>前往活动广场，发布你的第一场校园活动。</p>
@@ -405,6 +452,7 @@ function renderDynamicViews() {
   renderAllEvents();
   renderAgenda();
   renderFavorites();
+  renderFootprints();
   renderPublished();
 }
 
@@ -440,10 +488,19 @@ function showEvent(id) {
 
 function closeModal(modal) {
   modal.hidden = true;
-  if ($("#eventModal").hidden && $("#formModal").hidden) document.body.style.overflow = "";
+  if (
+    $("#eventModal").hidden &&
+    $("#formModal").hidden &&
+    $("#profileModal").hidden &&
+    $("#footprintModal").hidden &&
+    $("#publishModal").hidden
+  ) {
+    document.body.style.overflow = "";
+  }
 }
 
 function toggleFavorite(id) {
+  if (!requireLogin("请先登录后再收藏活动")) return;
   const numericId = Number(id);
   if (state.favorites.has(numericId)) {
     state.favorites.delete(numericId);
@@ -457,7 +514,6 @@ function toggleFavorite(id) {
   if (!$("#eventModal").hidden && state.activeEventId === numericId) showEvent(numericId);
 }
 
-// 【关键修改】打开活动报名表单：若发现未保存个人资料，提示并阻止报名，引导用户先补全身份信息
 function openRegistrationForm() {
   const event = events.find(item => item.id === state.activeEventId);
   if (!event) return;
@@ -467,16 +523,18 @@ function openRegistrationForm() {
     return;
   }
   
-  if (!state.profile || !state.profile.name || !state.profile.studentId) {
-    toast("请先去个人中心编辑资料并绑定学号班级！");
+  if (!hasCompleteProfile()) {
     closeModal($("#eventModal"));
-    navigate("profile");
+    requireLogin("请先登录后再报名活动");
     return;
   }
 
   $("#registrationForm").elements.name.value = state.profile.name;
   $("#registrationForm").elements.studentId.value = state.profile.studentId;
-  $("#registrationForm").elements.phone.value = state.profile.phone;
+  $("#registrationForm").elements.college.value = state.profile.college;
+  $("#registrationForm").elements.grade.value = state.profile.grade;
+  $("#registrationForm").elements.className.value = state.profile.className;
+  $("#registrationForm").elements.phone.value = state.profile.phone || "";
   $("#formEventName").textContent = event.title;
   $("#formModal").hidden = false;
 }
@@ -538,6 +596,11 @@ function bindEvents() {
     const deleteTarget = event.target.closest("[data-delete-event]");
     if (deleteTarget) {
       const id = Number(deleteTarget.dataset.deleteEvent);
+      const targetEvent = customEvents.find(item => item.id === id);
+      if (!isOwnEvent(targetEvent)) {
+        toast("只能删除自己发布的活动");
+        return;
+      }
       const customIndex = customEvents.findIndex(item => item.id === id);
       const eventIndex = events.findIndex(item => item.id === id);
       if (customIndex !== -1) customEvents.splice(customIndex, 1);
@@ -567,6 +630,7 @@ function bindEvents() {
 
   $("#clearFiltersButton").addEventListener("click", resetFilters);
   $("#publishButton").addEventListener("click", () => {
+    if (!requireLogin("请先登录后再创建活动")) return;
     const form = $("#publishForm");
     form.reset();
     form.elements.date.value = "2026-06-24";
@@ -597,6 +661,7 @@ function bindEvents() {
 
   $("#registrationForm").addEventListener("submit", event => {
     event.preventDefault();
+    state.profile.phone = event.currentTarget.elements.phone.value.trim();
     state.registrations.add(state.activeEventId);
     saveState();
     closeModal($("#formModal"));
@@ -644,7 +709,9 @@ function bindEvents() {
       joined: 0,
       popularity: 72,
       description: data.get("description").trim(),
-      createdByUser: true
+      createdByUser: true,
+      ownerStudentId: state.profile.studentId,
+      ownerName: state.profile.name
     };
     customEvents.unshift(newEvent);
     events.unshift(newEvent);
@@ -698,6 +765,7 @@ function init() {
   bindEvents();
   const initialRoute = location.hash.replace("#", "");
   navigate(["home", "events", "schedule", "profile"].includes(initialRoute) ? initialRoute : "home");
+  if (!hasCompleteProfile()) openProfileForm(true);
 }
 
 init();
