@@ -1,3 +1,5 @@
+/* ==================== 模块一：全局主题变量与基础样式 ==================== */
+/* 使用 CSS 变量统一管理颜色、阴影和背景，便于整体换肤与维护。 */
 :root {
   --bg: #f5f7f4;
   --surface: #ffffff;
@@ -14,6 +16,7 @@
   --header-height: 74px;
 }
 
+/* 深色模式：覆盖主题变量，具体组件会自动继承新的颜色。 */
 body.dark {
   --bg: #151a17;
   --surface: #1e2521;
@@ -82,6 +85,7 @@ img {
   top: 12px;
 }
 
+/* ==================== 模块二：顶部导航与通用按钮 ==================== */
 .site-header {
   position: sticky;
   top: 0;
@@ -241,6 +245,8 @@ img {
   to { opacity: 1; transform: none; }
 }
 
+/* ==================== 模块三：首页视觉与内容区域 ==================== */
+/* 首页包含主视觉、平台数据、精选活动、六大分类和校园故事。 */
 .hero {
   position: relative;
   min-height: min(690px, calc(100vh - var(--header-height)));
@@ -405,6 +411,8 @@ img {
   line-height: 1.25;
 }
 
+/* ==================== 模块四：活动卡片与分类展示 ==================== */
+/* 活动数据由 app.js 动态渲染为统一卡片，并根据宽度自动调整列数。 */
 .event-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -799,6 +807,7 @@ img {
   padding-bottom: 80px;
 }
 
+/* ==================== 模块五：活动广场搜索、筛选与排序 ==================== */
 .filter-toolbar {
   display: flex;
   align-items: end;
@@ -891,6 +900,7 @@ select {
   min-height: 220px;
 }
 
+/* ==================== 模块六：我的日程与日历 ==================== */
 .schedule-layout {
   display: grid;
   grid-template-columns: 340px 1fr;
@@ -1054,6 +1064,7 @@ select {
   cursor: pointer;
 }
 
+/* ==================== 模块七：个人中心与参与数据 ==================== */
 .profile-hero {
   min-height: 270px;
   display: flex;
@@ -1272,6 +1283,7 @@ select {
   font-size: 12px;
 }
 
+/* ==================== 模块八：详情、报名、登录和发布弹窗 ==================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1597,6 +1609,7 @@ select {
   bottom: 28px;
 }
 
+/* ==================== 模块九：平板端响应式适配 ==================== */
 @media (max-width: 900px) {
   .header-inner {
     gap: 12px;
@@ -1675,6 +1688,7 @@ select {
   }
 }
 
+/* ==================== 模块十：手机端响应式适配 ==================== */
 @media (max-width: 640px) {
   :root {
     --header-height: 66px;
@@ -1855,6 +1869,7 @@ select {
   }
 }
 
+/* 可访问性：当用户设置“减少动态效果”时，主动缩短动画和过渡。 */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

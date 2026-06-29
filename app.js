@@ -1,5 +1,7 @@
 "use strict";
 
+/* ==================== 模块一：基础数据与数据版本 ==================== */
+/* 数据版本变化时清理旧格式的用户数据，避免新旧字段不兼容。 */
 const DATA_VERSION = "student-login-20260624-owner-delete";
 if (localStorage.getItem("campusDataVersion") !== DATA_VERSION) {
   localStorage.removeItem("campusProfile");
@@ -8,6 +10,7 @@ if (localStorage.getItem("campusDataVersion") !== DATA_VERSION) {
   localStorage.setItem("campusDataVersion", DATA_VERSION);
 }
 
+/* 9 场内置活动：覆盖科技、运动、艺术、公益、音乐和阅读 6 大分类。 */
 const events = [
   {
     id: 1,
@@ -146,9 +149,11 @@ const events = [
   }
 ];
 
+/* 读取用户发布的活动，并与内置活动合并后统一渲染。 */
 const customEvents = JSON.parse(localStorage.getItem("campusCustomEvents") || "[]");
 events.push(...customEvents);
 
+/* 首页分类导航和发布表单共用的分类配置。 */
 const categories = [
   { name: "科技", icon: "⌘", text: "代码与创新" },
   { name: "运动", icon: "↗", text: "活力与挑战" },
@@ -158,6 +163,8 @@ const categories = [
   { name: "阅读", icon: "▤", text: "思想与交流" }
 ];
 
+/* ==================== 模块二：应用状态与本地持久化 ==================== */
+/* state 集中管理当前页面、收藏、报名、活动详情和学生资料。 */
 const state = {
   route: "home",
   favorites: new Set(JSON.parse(localStorage.getItem("campusFavorites") || "[]")),
@@ -166,19 +173,24 @@ const state = {
   profile: JSON.parse(localStorage.getItem("campusProfile") || "null")
 };
 
+/* 原生 DOM 查询辅助函数，减少重复的 querySelector 代码。 */
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 
+/* 将收藏、报名和个人资料保存到当前浏览器。 */
 function saveState() {
   localStorage.setItem("campusFavorites", JSON.stringify([...state.favorites]));
   localStorage.setItem("campusRegistrations", JSON.stringify([...state.registrations]));
   localStorage.setItem("campusProfile", JSON.stringify(state.profile));
 }
 
+/* 单独保存用户自主发布的活动。 */
 function saveCustomEvents() {
   localStorage.setItem("campusCustomEvents", JSON.stringify(customEvents));
 }
 
+/* ==================== 模块三：校园身份与操作权限 ==================== */
+/* 检查必填资料是否完整；联系电话不参与登录完整性判断。 */
 function hasCompleteProfile() {
   return Boolean(
     state.profile &&
@@ -190,6 +202,7 @@ function hasCompleteProfile() {
   );
 }
 
+/* 收藏、报名和发布前统一调用；未登录时自动打开身份录入弹窗。 */
 function requireLogin(message = "请先登录并完善个人资料") {
   if (hasCompleteProfile()) return true;
   toast(message);
@@ -197,6 +210,7 @@ function requireLogin(message = "请先登录并完善个人资料") {
   return false;
 }
 
+/* 通过发布者学号判断活动归属，实现“只能删除自己发布的活动”。 */
 function isOwnEvent(event) {
   return Boolean(
     event &&
@@ -206,6 +220,8 @@ function isOwnEvent(event) {
   );
 }
 
+/* ==================== 模块四：个人中心与参与足迹 ==================== */
+/* 根据登录状态更新头像、姓名和校园身份摘要。 */
 function renderProfile() {
   if (hasCompleteProfile()) {
     const initial = state.profile.name.trim().charAt(0) || "?";
@@ -222,6 +238,7 @@ function renderProfile() {
   }
 }
 
+/* 根据报名集合生成参与足迹，并同步更新个人中心统计。 */
 function renderFootprints() {
   const footprintEvents = events
     .filter(event => state.registrations.has(event.id))
@@ -251,6 +268,7 @@ function renderFootprints() {
   `;
 }
 
+/* 首次进入显示“学生登录”，后续打开时显示“编辑个人资料”。 */
 function openProfileForm(isLogin = false) {
   const form = $("#profileForm");
   const p = state.profile || {};
@@ -273,6 +291,8 @@ function openProfileForm(isLogin = false) {
   form.elements.name.focus();
 }
 
+/* ==================== 模块五：活动卡片与首页动态渲染 ==================== */
+/* 将 YYYY-MM-DD 格式转换为适合页面展示的中文日期。 */
 function formatDate(dateString, includeYear = false) {
   const date = new Date(`${dateString}T12:00:00`);
   return new Intl.DateTimeFormat("zh-CN", {
@@ -283,6 +303,7 @@ function formatDate(dateString, includeYear = false) {
   }).format(date);
 }
 
+/* 生成活动卡片；只有本人发布的活动才会生成删除按钮。 */
 function eventCard(event, manage = false) {
   const isFavorite = state.favorites.has(event.id);
   const canDelete = manage && isOwnEvent(event);
@@ -317,10 +338,12 @@ function eventCard(event, manage = false) {
   `;
 }
 
+/* 首页展示活动数组中的前 3 场精选活动。 */
 function renderFeatured() {
   $("#featuredGrid").innerHTML = events.slice(0, 3).map(eventCard).join("");
 }
 
+/* 根据 categories 配置生成首页分类和筛选下拉选项。 */
 function renderCategories() {
   $("#homeCategories").innerHTML = categories.map(category => `
     <button class="category-button" type="button" data-category-link="${category.name}">
@@ -336,6 +359,8 @@ function renderCategories() {
   `;
 }
 
+/* ==================== 模块六：活动搜索、筛选与排序 ==================== */
+/* 综合关键词、分类、时间和排序条件，返回符合要求的活动数组。 */
 function getFilteredEvents() {
   const keyword = $("#searchInput").value.trim().toLowerCase();
   const category = $("#categoryFilter").value;
@@ -365,6 +390,7 @@ function getFilteredEvents() {
   return filtered;
 }
 
+/* 把筛选结果渲染到活动广场，并处理筛选标签和空状态。 */
 function renderAllEvents() {
   const filtered = getFilteredEvents();
   $("#allEventsGrid").innerHTML = filtered.map(eventCard).join("");
@@ -378,6 +404,8 @@ function renderAllEvents() {
   $("#activeFilterRow").innerHTML = chips.map(chip => `<span class="filter-chip">${chip}</span>`).join("");
 }
 
+/* ==================== 模块七：日程、收藏与已发布活动 ==================== */
+/* 生成当月日历，并标记已经报名活动的日期。 */
 function renderCalendar() {
   const days = [25, 26, 27, 28, 29, 30, 31, ...Array.from({ length: 30 }, (_, i) => i + 1), 1, 2, 3, 4, 5];
   const registeredDays = new Set(
@@ -396,6 +424,7 @@ function renderCalendar() {
   }).join("");
 }
 
+/* 将报名集合转换为按日期排序的个人活动日程。 */
 function renderAgenda() {
   const registeredEvents = events
     .filter(event => state.registrations.has(event.id))
@@ -425,6 +454,7 @@ function renderAgenda() {
   renderCalendar();
 }
 
+/* 在个人中心展示当前浏览器保存的收藏活动。 */
 function renderFavorites() {
   const favoriteEvents = events.filter(event => state.favorites.has(event.id));
   $("#favoriteMetric").textContent = favoriteEvents.length;
@@ -436,6 +466,7 @@ function renderFavorites() {
   `;
 }
 
+/* 根据 ownerStudentId 筛选并展示当前学生本人发布的活动。 */
 function renderPublished() {
   const ownEvents = hasCompleteProfile() ? customEvents.filter(isOwnEvent) : [];
   $("#publishedGrid").innerHTML = ownEvents.length ? ownEvents.map(event => eventCard(event, true)).join("") : `
@@ -447,6 +478,7 @@ function renderPublished() {
   `;
 }
 
+/* 数据变化后统一刷新所有动态区域，保证多个页面状态一致。 */
 function renderDynamicViews() {
   renderFeatured();
   renderAllEvents();
@@ -456,6 +488,8 @@ function renderDynamicViews() {
   renderPublished();
 }
 
+/* ==================== 模块八：单页路由与弹窗控制 ==================== */
+/* 通过 data-page 和 URL 哈希切换页面，无需刷新整个网页。 */
 function navigate(route) {
   state.route = route;
   $$(".page").forEach(page => page.classList.toggle("active", page.dataset.page === route));
@@ -466,6 +500,7 @@ function navigate(route) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/* 根据活动 id 填充并打开活动详情弹窗。 */
 function showEvent(id) {
   const event = events.find(item => item.id === Number(id));
   if (!event) return;
@@ -486,6 +521,7 @@ function showEvent(id) {
   document.body.style.overflow = "hidden";
 }
 
+/* 关闭指定弹窗；全部弹窗关闭后恢复页面滚动。 */
 function closeModal(modal) {
   modal.hidden = true;
   if (
@@ -499,6 +535,8 @@ function closeModal(modal) {
   }
 }
 
+/* ==================== 模块九：收藏、报名与操作反馈 ==================== */
+/* 使用 Set 添加或删除活动 id，避免同一活动被重复收藏。 */
 function toggleFavorite(id) {
   if (!requireLogin("请先登录后再收藏活动")) return;
   const numericId = Number(id);
@@ -514,6 +552,7 @@ function toggleFavorite(id) {
   if (!$("#eventModal").hidden && state.activeEventId === numericId) showEvent(numericId);
 }
 
+/* 登录后自动带入学生资料；已报名时直接跳转到“我的日程”。 */
 function openRegistrationForm() {
   const event = events.find(item => item.id === state.activeEventId);
   if (!event) return;
@@ -539,6 +578,7 @@ function openRegistrationForm() {
   $("#formModal").hidden = false;
 }
 
+/* 显示短暂的操作结果提示，例如“报名成功”或“请先登录”。 */
 function toast(message) {
   const element = $("#toast");
   element.textContent = message;
@@ -547,6 +587,7 @@ function toast(message) {
   toast.timer = setTimeout(() => element.classList.remove("show"), 2200);
 }
 
+/* 一键恢复活动广场的默认筛选条件。 */
 function resetFilters() {
   $("#searchInput").value = "";
   $("#categoryFilter").value = "all";
@@ -555,7 +596,10 @@ function resetFilters() {
   renderAllEvents();
 }
 
+/* ==================== 模块十：用户交互、发布活动与删除权限 ==================== */
+/* 统一绑定导航、筛选、收藏、报名、发布、删除和键盘操作。 */
 function bindEvents() {
+  /* 事件委托：处理动态生成的导航、详情、收藏、分类、取消报名和删除按钮。 */
   document.addEventListener("click", event => {
     const routeTarget = event.target.closest("[data-route]");
     if (routeTarget) {
@@ -614,6 +658,7 @@ function bindEvents() {
     }
   });
 
+  /* 顶部菜单与深色模式切换。 */
   $("#menuButton").addEventListener("click", () => {
     const isOpen = $("#mainNav").classList.toggle("open");
     $("#menuButton").setAttribute("aria-expanded", String(isOpen));
@@ -624,11 +669,13 @@ function bindEvents() {
     localStorage.setItem("campusTheme", document.body.classList.contains("dark") ? "dark" : "light");
   });
 
+  /* 输入或选择条件后实时重新筛选活动。 */
   ["searchInput", "categoryFilter", "timeFilter", "sortFilter"].forEach(id => {
     $(`#${id}`).addEventListener(id === "searchInput" ? "input" : "change", renderAllEvents);
   });
 
   $("#clearFiltersButton").addEventListener("click", resetFilters);
+  /* 创建活动前检查登录状态，并为发布表单填写默认值。 */
   $("#publishButton").addEventListener("click", () => {
     if (!requireLogin("请先登录后再创建活动")) return;
     const form = $("#publishForm");
@@ -659,6 +706,7 @@ function bindEvents() {
   $("#modalFavorite").addEventListener("click", () => toggleFavorite(state.activeEventId));
   $("#modalRegister").addEventListener("click", openRegistrationForm);
 
+  /* 提交报名：保存活动 id，刷新日程和个人中心。 */
   $("#registrationForm").addEventListener("submit", event => {
     event.preventDefault();
     state.profile.phone = event.currentTarget.elements.phone.value.trim();
@@ -683,6 +731,7 @@ function bindEvents() {
   $("#publishModal").addEventListener("click", event => {
     if (event.target === $("#publishModal")) closeModal($("#publishModal"));
   });
+  /* 提交发布：校验时间，创建活动对象并写入 localStorage。 */
   $("#publishForm").addEventListener("submit", event => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -726,7 +775,7 @@ function bindEvents() {
     if (event.target === $("#profileModal")) closeModal($("#profileModal"));
   });
   
-  // 【关键修改】处理个人资料提交：完整捕获新增的 studentId (学号) 和 className (班级) 并更新系统状态
+  /* 保存姓名、学号、学院、年级、班级和选填联系电话。 */
   $("#profileForm").addEventListener("submit", event => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -745,6 +794,7 @@ function bindEvents() {
   });
   $("#editInterestsButton").addEventListener("click", () => toast("兴趣标签编辑功能演示"));
 
+  /* 可访问性：按 Escape 键可以关闭当前打开的弹窗。 */
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       closeModal($("#eventModal"));
@@ -756,6 +806,8 @@ function bindEvents() {
   });
 }
 
+/* ==================== 模块十一：应用初始化入口 ==================== */
+/* 恢复主题和本地数据、渲染页面、绑定事件，并处理首次登录。 */
 function init() {
   if (localStorage.getItem("campusTheme") === "dark") document.body.classList.add("dark");
   renderCategories();
